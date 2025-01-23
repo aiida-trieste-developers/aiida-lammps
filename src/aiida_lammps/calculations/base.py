@@ -13,6 +13,7 @@ from typing import ClassVar, Union
 from aiida import orm
 from aiida.common import datastructures
 from aiida.engine import CalcJob
+from aiida.orm import SinglefileData
 
 from aiida_lammps.data.potential import LammpsPotentialData
 from aiida_lammps.data.trajectory import LammpsTrajectory
@@ -59,6 +60,12 @@ class LammpsBaseCalculation(CalcJob):
             "potential",
             valid_type=LammpsPotentialData,
             help="Potential used in the ``LAMMPS`` calculation",
+        )
+        spec.input(
+            "additional_potential",
+            required=False,
+            valid_type=SinglefileData,
+            help="Additional potential used in the ``LAMMPS`` calculation",
         )
         spec.input(
             "parameters",
@@ -364,6 +371,14 @@ class LammpsBaseCalculation(CalcJob):
 
         with folder.open(_structure_filename, "w") as handle:
             handle.write(structure_filecontent)
+
+        # Write the potential to the remote folder
+        if "additional_potential" in self.inputs: 
+            with folder.open(self.inputs.additional_potential.filename, "wb") as handle:
+                # Read the contents of the potential file in binary mode
+                with self.inputs.additional_potential.open(mode="rb") as file_handle:
+                    file_content = file_handle.read()
+                handle.write(file_content)
 
         # Write the potential to the remote folder
         with folder.open(self._POTENTIAL_FILENAME, "wb") as handle:
