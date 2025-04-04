@@ -248,10 +248,11 @@ def write_potential_block(
         potential_block += (
             f' {parameters_potential.get("potential_style_options")}\n'
         )  
-        if "pair_coeff_1" in parameters_potential:      
-            potential_block += (
-                f'pair_coeff * * {parameters_potential["pair_coeff_1"]}\n'
-            )
+        if "pair_coeff_list" in parameters_potential:   
+            for pair_coeff in parameters_potential["pair_coeff_list"]:   
+                potential_block += (
+                    f'pair_coeff * * {pair_coeff}\n'
+                )
         else:
             if default_potential[potential.pair_style].get("read_from_file"):
                 potential_block += f'pair_coeff * * {potential_file} {" ".join(kind_symbols)}\n'
@@ -261,11 +262,7 @@ def write_potential_block(
                     for line in potential.get_content().split("\n")
                     if not line.startswith("#") and line
             ]
-            potential_block += f'pair_coeff * * {" ".join(data)}\n'
-        if "pair_coeff_2" in parameters_potential:
-            potential_block += (
-                f'pair_coeff * * {parameters_potential["pair_coeff_2"]}\n'
-            )
+            potential_block += f'pair_coeff * * {" ".join(data)}\n'        
     else:
         potential_block += (
             f' {" ".join(parameters_potential.get("potential_style_options", [""]))}\n'
