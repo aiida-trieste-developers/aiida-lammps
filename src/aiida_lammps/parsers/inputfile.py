@@ -251,32 +251,32 @@ def write_potential_block(
         if "pair_coeff_list" in parameters_potential:   
             for pair_coeff in parameters_potential["pair_coeff_list"]:   
                 potential_block += (
-                    f'pair_coeff * * {pair_coeff}\n'
+                    f'pair_coeff {pair_coeff}\n'
                 )
         else:
             if default_potential[potential.pair_style].get("read_from_file"):
-                potential_block += f'pair_coeff * * {potential_file} {" ".join(kind_symbols)}\n'
+                potential_block += f'pair_coeff {potential_file} {" ".join(kind_symbols)}\n'
             if not default_potential[potential.pair_style].get("read_from_file"):
                 data = [
                     line
                     for line in potential.get_content().split("\n")
                     if not line.startswith("#") and line
             ]
-            potential_block += f'pair_coeff * * {" ".join(data)}\n'        
+            potential_block += f'pair_coeff {" ".join(data)}\n'        
     else:
         potential_block += (
             f' {" ".join(parameters_potential.get("potential_style_options", [""]))}\n'
         )
 
         if default_potential[potential.pair_style].get("read_from_file"):
-            potential_block += f'pair_coeff * * {potential_file} {" ".join(kind_symbols)}\n'
+            potential_block += f'pair_coeff {potential_file} {" ".join(kind_symbols)}\n'
         if not default_potential[potential.pair_style].get("read_from_file"):
             data = [
                 line
                 for line in potential.get_content().split("\n")
                 if not line.startswith("#") and line
             ]
-            potential_block += f'pair_coeff * * {" ".join(data)}\n'
+            potential_block += f'pair_coeff {" ".join(data)}\n'
 
     if "neighbor" in parameters_potential:
         potential_block += (
