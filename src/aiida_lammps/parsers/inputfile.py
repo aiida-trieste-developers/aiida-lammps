@@ -245,10 +245,9 @@ def write_potential_block(
     potential_block = generate_header("Start of Potential information")
     potential_block += f"pair_style {potential.pair_style}"
     if potential.pair_style == "hybrid/overlay":
-        potential_block += (
-            f' {parameters_potential.get("potential_style_options")}\n'
-        )  
-        if "pair_coeff_list" in parameters_potential:   
+        potential_block += f' {parameters_potential["potential_style_options"]}\n'
+
+        if "pair_coeff_list" in parameters_potential:
             for pair_coeff in parameters_potential["pair_coeff_list"]:   
                 potential_block += (
                     f'pair_coeff {pair_coeff}\n'
@@ -261,8 +260,8 @@ def write_potential_block(
                     line
                     for line in potential.get_content().split("\n")
                     if not line.startswith("#") and line
-            ]
-            potential_block += f'pair_coeff {" ".join(data)}\n'        
+                ]
+                potential_block += f'pair_coeff {" ".join(data)}\n'        
     else:
         potential_block += (
             f' {" ".join(parameters_potential.get("potential_style_options", [""]))}\n'
