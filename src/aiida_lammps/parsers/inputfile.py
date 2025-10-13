@@ -244,7 +244,7 @@ def write_potential_block(
 
     potential_block = generate_header("Start of Potential information")
     potential_block += f"pair_style {potential.pair_style}"
-    if potential.pair_style == "hybrid/overlay":
+    if potential.pair_style in ["hybrid/overlay", "metatomic"]:
         potential_block += f' {parameters_potential["potential_style_options"]}\n'
 
         if "pair_coeff_list" in parameters_potential:
