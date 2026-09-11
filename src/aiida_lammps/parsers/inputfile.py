@@ -244,38 +244,25 @@ def write_potential_block(
 
     potential_block = generate_header("Start of Potential information")
     potential_block += f"pair_style {potential.pair_style}"
-    if potential.pair_style in ["hybrid/overlay", "metatomic"]:
-        potential_block += f' {parameters_potential["potential_style_options"]}\n'
 
-        if "pair_coeff_list" in parameters_potential:
-            for pair_coeff in parameters_potential["pair_coeff_list"]:   
-                potential_block += (
-                    f'pair_coeff {pair_coeff}\n'
-                )
-        else:
-            if default_potential[potential.pair_style].get("read_from_file"):
-                potential_block += f'pair_coeff {potential_file} {" ".join(kind_symbols)}\n'
-            if not default_potential[potential.pair_style].get("read_from_file"):
-                data = [
-                    line
-                    for line in potential.get_content().split("\n")
-                    if not line.startswith("#") and line
-                ]
-                potential_block += f'pair_coeff {" ".join(data)}\n'        
+    options = parameters_potential.get("potential_style_options", "")
+    if not isinstance(options, str):
+        options = " ".join(options)
+    potential_block += f" {options}\n"
+
+    if "pair_coeff_list" in parameters_potential:
+        # User-provided `pair_coeff` lines are used verbatim, atom-type selector included.
+        for pair_coeff in parameters_potential["pair_coeff_list"]:
+            potential_block += f"pair_coeff {pair_coeff}\n"
+    elif default_potential.get(potential.pair_style, {}).get("read_from_file"):
+        potential_block += f'pair_coeff * * {potential_file} {" ".join(kind_symbols)}\n'
     else:
-        potential_block += (
-            f' {" ".join(parameters_potential.get("potential_style_options", [""]))}\n'
-        )
-
-        if default_potential[potential.pair_style].get("read_from_file"):
-            potential_block += f'pair_coeff {potential_file} {" ".join(kind_symbols)}\n'
-        if not default_potential[potential.pair_style].get("read_from_file"):
-            data = [
-                line
-                for line in potential.get_content().split("\n")
-                if not line.startswith("#") and line
-            ]
-            potential_block += f'pair_coeff {" ".join(data)}\n'
+        data = [
+            line
+            for line in potential.get_content().split("\n")
+            if not line.startswith("#") and line
+        ]
+        potential_block += f'pair_coeff * * {" ".join(data)}\n'
 
     if "neighbor" in parameters_potential:
         potential_block += (

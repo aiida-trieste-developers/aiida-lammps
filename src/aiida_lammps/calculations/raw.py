@@ -138,7 +138,12 @@ class LammpsRawCalculation(CalcJob):
             provenance_exclude_list.append(filename)
 
         codeinfo = CodeInfo()
-        codeinfo.cmdline_params = ["-in", filename_input]
+        cmdline_params = ["-in", filename_input]
+        if "settings" in self.inputs:
+            cmdline_params += self.inputs.settings.get_dict().get(
+                "additional_cmdline_params", []
+            )
+        codeinfo.cmdline_params = cmdline_params
         codeinfo.code_uuid = self.inputs.code.uuid
         codeinfo.stdout_name = self.inputs.metadata.options.output_filename
 

@@ -373,15 +373,27 @@ class LammpsBaseCalculation(CalcJob):
             handle.write(structure_filecontent)
 
         # Write the potential to the remote folder
-        if "additional_potential" in self.inputs: 
+        if "additional_potential" in self.inputs:
             with folder.open(self.inputs.additional_potential.filename, "wb") as handle:
                 # Read the contents of the potential file in binary mode
                 with self.inputs.additional_potential.open(mode="rb") as file_handle:
                     file_content = file_handle.read()
                 handle.write(file_content)
 
-        # Write the potential to the remote folder
-        with folder.open(self._POTENTIAL_FILENAME, "wb") as handle:
+        # Write the potential to the remote folder. Some pair styles (e.g. ``mliap``,
+        # which expects a PyTorch ``.pt`` model) require a specific filename/extension
+        # for their loader to work, so this is looked up per pair_style instead of
+        # being a single fixed name for every potential. When the potential's own
+        # pair_style doesn't reveal the actual engine (e.g. it is wrapped in
+        # ``hybrid/overlay``), an explicit ``potential_filename`` in the "potential"
+        # parameters takes precedence over the pair_style-based lookup.
+        potential_filename = _parameters.get("potential", {}).get(
+            "potential_filename"
+        ) or LammpsPotentialData.default_potential_info.get(
+            self.inputs.potential.pair_style, {}
+        ).get("filename", self._POTENTIAL_FILENAME)
+
+        with folder.open(potential_filename, "wb") as handle:
             # Read the contents of the potential file in binary mode
             with self.inputs.potential.open(mode="rb") as potential_handle:
                 potential_content = potential_handle.read()
@@ -394,6 +406,7 @@ class LammpsBaseCalculation(CalcJob):
             potential=self.inputs.potential,
             structure=self.inputs.structure,
             parameters=_parameters,
+            potential_filename=potential_filename,
             restart_filename=_restart_filename,
             trajectory_filename=_trajectory_filename,
             variables_filename=_variables_filename,

@@ -220,11 +220,15 @@ class LammpsPotentialData(orm.SinglefileData):
         source = cls.prepare_source(source)
 
         query = orm.QueryBuilder()
-        query.append(
-            cls,
-            subclassing=False,
-            filters={f"attributes.{cls._key_md5}": md5_from_filelike(source)},
-        )
+        filters = {
+            f"attributes.{cls._key_md5}": md5_from_filelike(source),
+            "attributes.pair_style": pair_style,
+            "attributes.species": species,
+            "attributes.atom_style": atom_style,
+            "attributes.default_units": units,
+        }
+
+        query.append(cls, subclassing=False, filters=filters)
 
         existing = query.first()
 
