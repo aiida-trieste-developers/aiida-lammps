@@ -104,6 +104,7 @@
         "lj/sf/dipole/sf":{"units": "metal", "atom_style": "atomic", "read_from_file": false},
         "lj/cut/dipole/long":{"units": "metal", "atom_style": "atomic", "read_from_file": false},
         "lj/long/dipole/long":{"units": "metal", "atom_style": "atomic", "read_from_file": false},
+        "deepmd":{"units": "metal", "atom_style": "atomic", "read_from_file": true, "filename": "potential.pth"},
         "dpd":{"units": "unknown", "atom_style": "atomic", "read_from_file": false},
         "dpd/tstat":{"units": "unknown", "atom_style": "atomic", "read_from_file": false},
         "dpd/ext":{"units": "unknown", "atom_style": "atomic", "read_from_file": false},
